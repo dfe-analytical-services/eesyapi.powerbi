@@ -1,10 +1,10 @@
 // This file contains Data Connector logic
 [Version = "1.0.0"]
-section eesyapiConnector;
+section eesyapiDemoConnector;
 
 
-[DataSource.Kind="eesyapiConnector", Publish="eesyapiConnector.Publish"]
-shared eesyapiConnector.Contents = () =>
+[DataSource.Kind="eesyapiDemoConnector", Publish="eesyapiDemoConnector.Publish"]
+shared eesyapiDemoConnector.Contents = () =>
     let
     // Query to fetch latest version details
     Dataset_Id = Text.From("e1ae9201-2fff-d376-8fa3-bd3c3660d4c8"),
@@ -27,24 +27,24 @@ in
     Data_Set;
 
 // Data Source Kind description
-eesyapiConnector = [
+eesyapiDemoConnector = [
     Authentication = [
         UsernamePassword = [] // Power BI will prompt user for credentials
     ]
 ];
 
 // Data Source UI publishing description
-eesyapiConnector.Publish = [
+eesyapiDemoConnector.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
     LearnMoreUrl = "https://powerbi.microsoft.com/",
-    SourceImage = eesyapiConnector.Icons,
-    SourceTypeImage = eesyapiConnector.Icons
+    SourceImage = eesyapiDemoConnector.Icons,
+    SourceTypeImage = eesyapiDemoConnector.Icons
 ];
 
-eesyapiConnector.Icons = [
-    Icon16 = { Extension.Contents("eesyapiConnector16.png"), Extension.Contents("eesyapiConnector20.png"), Extension.Contents("eesyapiConnector24.png"), Extension.Contents("eesyapiConnector32.png") },
-    Icon32 = { Extension.Contents("eesyapiConnector32.png"), Extension.Contents("eesyapiConnector40.png"), Extension.Contents("eesyapiConnector48.png"), Extension.Contents("eesyapiConnector64.png") }
+eesyapiDemoConnector.Icons = [
+    Icon16 = { Extension.Contents("eesyapi16.png")},
+    Icon32 = { Extension.Contents("eesyapi32.png")}
 ];
 
