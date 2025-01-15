@@ -19,7 +19,7 @@ shared eesyapiDemoConnector.Contents = () =>
     Latest_Version_Number = Changed_Type{0}[latestVersion.version],
 
     // Main query using the latest version details
-    Source_Csv = Csv.Document(Web.Contents("https://test.statistics.api.education.gov.uk/v1.0/data-sets/" & Dataset_Id & "/csv?dataSetVersion=" & Latest_Version_Number), [Delimiter=",", Columns=22, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    Source_Csv = Csv.Document(Web.Contents("https://test.statistics.api.education.gov.uk/v1.0/data-sets/" & Dataset_Id & "/csv?dataSetVersion=" & Latest_Version_Number), [Delimiter=",", Encoding=1252, QuoteStyle=QuoteStyle.None]),
     Data_With_Headers = Table.PromoteHeaders(Source_Csv, [PromoteAllScalars=true]),
     Data_Set = Table.TransformColumnTypes(Data_With_Headers, {{"time_period", type text}, {"time_identifier", type text}, {"geographic_level", type text}, {"country_code", type text}, {"country_name", type text}})
 
