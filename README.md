@@ -32,9 +32,7 @@ We provide a demo connector to one of the EES API data sets, which downloads the
 
 # Contributing
 
-These connectors are being developed in VS Code with the Power Query SDK extension installed.
+These connectors are being developed in **VS Code** with the **Power Query SDK** extension installed.
 
 If making changes to any power query script, it's worth running **Evaluate current file** in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary files for debugging.
-
-*Note: I've not figured out how to get the authentication working in VS Code yet, so the debugging doesn't actually work right now.*
 
