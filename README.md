@@ -7,7 +7,7 @@ Custom connectors for connecting to the Explore Education Statistics service fro
 
 > 🚧 Warning
 >
->If you've never used custom connectors in Power BI Desktop before, then you'll need to follow these steps before any of the instructions that follow below.
+> If you've never used custom connectors in Power BI Desktop before, then you'll need to follow these steps before any of the instructions that follow below.
 
 - Create the folder **Custom connectors/** in **Documents/Power BI Desktop/** (which itself should exist already, but depending on the system you're on and how it's set up, may be within your OneDrive area).
 - In Power BI Desktop go to **Settings > Global > Security > Data extensions** and **Allow any extension to load without validation or warning**.
@@ -44,4 +44,4 @@ If making changes to any power query script, it's worth running **Evaluate curre
 
 The following are useful to read / look through if starting out on contributing.
 
-- [DataConnctors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md)
+- [DataConnectors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md)
