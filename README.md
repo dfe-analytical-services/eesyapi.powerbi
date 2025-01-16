@@ -34,10 +34,10 @@ We provide a demo connector to one of the EES API data sets, which downloads the
 
 These connectors are being developed in **VS Code** with the **Power Query SDK** extension installed.
 
-If making changes to any power query script, it's worth running **Evaluate current file** on the corresponding *\*.query.pq* script in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary files for running and debugging.
+If making changes to any power query script, it's worth running **Evaluate current file** on the corresponding *[script_name].query.pq* script in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary files for running and debugging.
 
 > 🚧 Warning
 >
-> If you run **Evaluate current file** on the base *\*.pq* script (as opposed to the *\*.query.pq* script), then Power Query SDK will likely double compile the script and give an error along the lines of `The export \*.Contents was exported multiple times.`
+> If you run **Evaluate current file** on the base *[script_name].pq* script (as opposed to the *[script_name].query.pq* script), then Power Query SDK will likely double compile the script and give an error along the lines of `The export [script_name].Contents was exported multiple times.`
 
 
