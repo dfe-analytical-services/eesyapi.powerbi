@@ -40,4 +40,8 @@ If making changes to any power query script, it's worth running **Evaluate curre
 >
 > If you run **Evaluate current file** on the base *[script_name].pq* script (as opposed to the *[script_name].query.pq* script), then Power Query SDK will likely double compile the script and give an error along the lines of `The export [script_name].Contents was exported multiple times.`
 
+## Useful reference materials
 
+The following are useful to read / look through if starting out on contributing.
+
+- [DataConnctors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md)
