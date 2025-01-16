@@ -44,7 +44,14 @@ eesyapiDemoConnector.Publish = [
 ];
 
 eesyapiDemoConnector.Icons = [
-    Icon16 = { Extension.Contents("eesyapi16.png")},
-    Icon32 = { Extension.Contents("eesyapi32.png")}
+    Icon16 = { 
+        Extension.Contents("eesyapi16.png"),
+        Extension.Contents("eesyapi32.png")
+        },
+    Icon32 = {
+        Extension.Contents("eesyapi32.png"),
+        Extension.Contents("eesyapi64.png"),
+        Extension.Contents("eesyapi120.png")
+        }
 ];
 
