@@ -9,7 +9,7 @@ Custom connectors for connecting to the Explore Education Statistics service fro
 >
 >If you've never used custom connectors in Power BI Desktop before, then you'll need to follow these steps before any of the instructions that follow below.
 
-- Create the folder **Custom connectors/** in **Documents/Power BI Desktop/**
+- Create the folder **Custom connectors/** in **Documents/Power BI Desktop/** (which itself should exist already, but depending on the system you're on and how it's set up, may be within your OneDrive area).
 - In Power BI Desktop go to **Settings > Global > Security > Data extensions** and **Allow any extension to load without validation or warning**.
 
 ## Demo EES CSV endpoint connector

@@ -38,7 +38,7 @@ eesyapiDemoConnector.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
-    LearnMoreUrl = "https://powerbi.microsoft.com/",
+    LearnMoreUrl = "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/",
     SourceImage = eesyapiDemoConnector.Icons,
     SourceTypeImage = eesyapiDemoConnector.Icons
 ];
