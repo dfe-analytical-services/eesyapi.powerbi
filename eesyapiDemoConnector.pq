@@ -29,7 +29,7 @@ in
 // Data Source Kind description
 eesyapiDemoConnector = [
     Authentication = [
-        UsernamePassword = [] // Power BI will prompt user for credentials
+        Anonymous = []
     ]
 ];
 
