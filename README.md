@@ -50,3 +50,6 @@ The following are useful to read / watch if starting out on contributing.
 
 - [DataConnectors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md) (useful range of working examples of custom connectors).
 
+## Acknowlegements
+
+Thanks to Wayne Perry for giving us a steer towards custom connectors and a starting point in writing this one.
