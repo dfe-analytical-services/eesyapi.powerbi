@@ -1,5 +1,4 @@
 // This file contains Data Connector logic
-[Version = "1.0.0"]
 section eesyapiCSV;
 
 
