@@ -12,21 +12,23 @@ Custom connectors for connecting to the Explore Education Statistics service fro
 - Create the folder **Custom connectors/** in **Documents/Power BI Desktop/** (which itself may exist already, but depending on the system you're on and how it's set up, it may be within your OneDrive area or you might need to make your own).
 - In Power BI Desktop go to **Settings > Global > Security > Data extensions** and **Allow any extension to load without validation or warning**.
 
-## Demo EES CSV endpoint connector
+## EES CSV endpoint connector
 
-We provide a demo connector to one of the EES API data sets, which downloads the entire data set (16 rows). 
+This connector retrieves an entire data set on request when given a data set ID. 
 
 ### Using this connector in Power BI
 
 - Complete the steps in [Enabling custom connectors in Power BI](#enabling-custom-connectors-in-power-bi) if this is your first time using a custom connector in Power BI Desktop.
 
-- Copy the demo connector power query, **eesyapiDemoConnector.pq**, from this repository to your PowerBI custom connectors folder, **Documents/Power BI Desktop/Custom connectors/**.
+- Copy the eesyapi CSV connector MEZ binary, **bin/AnyCPU/Debug/eesyapiCSV.mex**, from this repository to your PowerBI custom connectors folder, **Documents/Power BI Desktop/Custom connectors/**.
 
 - From the Power BI Desktop home panel, select **Get data from other sources**.
 
-- Enter **eesyapi** in the search box and then select **eesyapiDemoConnector.Contents (Beta) (Custom)**.
+- Enter **eesyapi** in the search box and then select **eesyapiCSV.Contents (Beta) (Custom)**.
 
-- Click continue to accept this third part service.
+- If prompted, click continue to accept this third party service.
+
+- You should be prompted for a data set ID at this point, you can retrieve this from the data set's information page on Explore Education Statistics and paste it here. This should look something like: *e1ae9201-2fff-d376-8fa3-bd3c3660d4c8*.
 
 - You should now see a preview of the data and have the choice to either **load** the data set or **transform** it.
 
@@ -34,7 +36,7 @@ We provide a demo connector to one of the EES API data sets, which downloads the
 
 These connectors are being developed in **VS Code** with the **Power Query SDK** extension installed.
 
-If making changes to any power query script, it's worth running **Evaluate current file** on the corresponding *[script_name].query.pq* script in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary files for running and debugging.
+If making changes to any power query script, make sure to run **Evaluate current file** on the corresponding *[script_name].query.pq* script in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary file that can be used for debugging and that users can copy across to their custom connectors folder.
 
 > 🚧 Warning
 >
@@ -42,6 +44,12 @@ If making changes to any power query script, it's worth running **Evaluate curre
 
 ## Useful reference materials
 
-The following are useful to read / look through if starting out on contributing.
+The following are useful to read / watch if starting out on contributing.
 
-- [DataConnectors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md)
+- [Matt Masson's YouTube demo of creating a custom connector](https://www.youtube.com/watch?v=ecfRTEoYadI) (it's 7 years old, but *very* much worth a watch as a jumping off point if you're new to custom connectors).
+
+- [DataConnectors GitHub repository with sample connectors](https://github.com/microsoft/DataConnectors/blob/master/README.md) (useful range of working examples of custom connectors).
+
+## Acknowlegements
+
+Thanks to Wayne Perry for giving us a steer towards custom connectors and a starting point in writing this one.

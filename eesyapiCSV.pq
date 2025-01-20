@@ -1,13 +1,26 @@
 // This file contains Data Connector logic
-[Version = "1.0.0"]
-section eesyapiDemoConnector;
+section eesyapiCSV;
 
 
-[DataSource.Kind="eesyapiDemoConnector", Publish="eesyapiDemoConnector.Publish"]
-shared eesyapiDemoConnector.Contents = () =>
+[DataSource.Kind="eesyapiCSV", Publish="eesyapiCSV.Publish"]
+shared eesyapiCSV.Contents = Value.ReplaceType(ContentsImpl, eesyapiContentsType);
+
+eesyapiContentsType = type function(
+    Dataset_Id as (type text meta [
+        Documentation.FieldCaption = "Data set ID",
+        Documentation.FieldDescription = "ID of the data set on Explore Education Statistics",
+        DataSource.Path = false // don't include in data source path calculation
+    ])
+    )
+
+    as table meta [
+        Documentation.Name = "EES data set",
+        Documentation.LongDescription = "Retrieve an EES data set from its CSV endpoint"
+    ];
+
+ContentsImpl = (Dataset_Id as text) =>
     let
     // Query to fetch latest version details
-    Dataset_Id = Text.From("e1ae9201-2fff-d376-8fa3-bd3c3660d4c8"),
     Source_Summary = Json.Document(Web.Contents("https://test.statistics.api.education.gov.uk/v1.0/data-sets/" & Dataset_Id)),
     Sessions_Table = Table.FromRecords({Source_Summary}),
     Expanded_latestVersion = Table.ExpandRecordColumn(Sessions_Table, "latestVersion", {"version", "published", "totalResults", "file", "timePeriods", "geographicLevels", "filters", "indicators"}, {"latestVersion.version", "latestVersion.published", "latestVersion.totalResults", "latestVersion.file", "latestVersion.timePeriods", "latestVersion.geographicLevels", "latestVersion.filters", "latestVersion.indicators"}),
@@ -27,23 +40,23 @@ in
     Data_Set;
 
 // Data Source Kind description
-eesyapiDemoConnector = [
+eesyapiCSV = [
     Authentication = [
         Anonymous = []
     ]
 ];
 
 // Data Source UI publishing description
-eesyapiDemoConnector.Publish = [
+eesyapiCSV.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
     LearnMoreUrl = "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/",
-    SourceImage = eesyapiDemoConnector.Icons,
-    SourceTypeImage = eesyapiDemoConnector.Icons
+    SourceImage = eesyapiCSV.Icons,
+    SourceTypeImage = eesyapiCSV.Icons
 ];
 
-eesyapiDemoConnector.Icons = [
+eesyapiCSV.Icons = [
     Icon16 = { 
         Extension.Contents("eesyapi16.png"),
         Extension.Contents("eesyapi32.png")
