@@ -22,7 +22,7 @@ This connector retrieves an entire data set on request when given a data set ID.
 
 - Complete the steps in [Enabling custom connectors in Power BI](#enabling-custom-connectors-in-power-bi) if this is your first time using a custom connector in Power BI Desktop.
 
-- Copy the eesyapi CSV connector MEZ binary, **bin/AnyCPU/Debug/eesyapiCSV.mex**, from this repository to your PowerBI custom connectors folder, **Documents/Power BI Desktop/Custom connectors/**.
+- Copy the eesyapi CSV connector MEZ binary, **bin/AnyCPU/Debug/eesyapiCSV.mez**, from this repository to your PowerBI custom connectors folder, **Documents/Power BI Desktop/Custom connectors/**.
 
 - From the Power BI Desktop home panel, select **Get data from other sources**.
 
