@@ -34,6 +34,9 @@ This connector retrieves an entire data set on request when given a data set ID.
 
 - You should now see a preview of the data and have the choice to either **load** the data set or **transform** it.
 
+> [!NOTE] 
+> DfE data uses standard government symbols for missing data and these may be parsed as errors when connecting to the data via PowerBI. The data should still be returned fully, but with standard symbols such as *x*, *z* and *c* replaced by *Error*.
+
 #### Live refreshes
 
 As Microsoft have currently put [certification for custom connectors](https://learn.microsoft.com/en-us/fabric/data-factory/connector-certification) on hold, this software remains an uncertified connector. As an uncertified custom connector, it will require users to [set up an on-premises gateway](https://learn.microsoft.com/en-us/power-bi/connect-data/service-gateway-onprem) to enable automatic refreshes of data in the Power BI Service. The gateway acts as a bridge between the Power BI Service in the cloud and the custom connector running locally on the user's machine, allowing datasets to automatically refresh by routing queries via the gateway to access the data source.
