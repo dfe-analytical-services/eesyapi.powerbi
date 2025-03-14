@@ -20,19 +20,8 @@ eesyapiContentsType = type function(
 
 ContentsImpl = (Dataset_Id as text) =>
     let
-    // Query to fetch latest version details
-    Source_Summary = Json.Document(Web.Contents("https://api.education.gov.uk/statistics/v1/data-sets/" & Dataset_Id)),
-    Sessions_Table = Table.FromRecords({Source_Summary}),
-    Expanded_latestVersion = Table.ExpandRecordColumn(Sessions_Table, "latestVersion", {"version", "published", "totalResults", "file", "timePeriods", "geographicLevels", "filters", "indicators"}, {"latestVersion.version", "latestVersion.published", "latestVersion.totalResults", "latestVersion.file", "latestVersion.timePeriods", "latestVersion.geographicLevels", "latestVersion.filters", "latestVersion.indicators"}),
-    Expanded_latestVersion.file = Table.ExpandRecordColumn(Expanded_latestVersion, "latestVersion.file", {"id"}, {"latestVersion.file.id"}),
-    Expanded_latestVersion.timePeriods = Table.ExpandRecordColumn(Expanded_latestVersion.file, "latestVersion.timePeriods", {"start", "end"}, {"latestVersion.timePeriods.start", "latestVersion.timePeriods.end"}),
-    Changed_Type = Table.TransformColumnTypes(Expanded_latestVersion.timePeriods,{{"latestVersion.published", type text}}),
-
-    // Extracting the latest version details
-    Latest_Version_Number = Changed_Type{0}[latestVersion.version],
-
-    // Main query using the latest version details
-    Source_Csv = Csv.Document(Web.Contents("https://api.education.gov.uk/statistics/v1/data-sets/" & Dataset_Id & "/csv?dataSetVersion=" & Latest_Version_Number), [Delimiter=",", Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    // Query the latest version
+    Source_Csv = Csv.Document(Web.Contents("https://api.education.gov.uk/statistics/v1/data-sets/" & Dataset_Id & "/csv?dataSetVersion=*"), [Delimiter=",", Encoding=1252, QuoteStyle=QuoteStyle.None]),
     Data_With_Headers = Table.PromoteHeaders(Source_Csv, [PromoteAllScalars=true]),
     Data_Set = Table.TransformColumnTypes(Data_With_Headers, {{"time_period", type text}, {"time_identifier", type text}, {"geographic_level", type text}, {"country_code", type text}, {"country_name", type text}})
 
