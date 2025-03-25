@@ -8,20 +8,28 @@ shared eesyapiCSV.Contents = Value.ReplaceType(ContentsImpl, eesyapiContentsType
 eesyapiContentsType = type function(
     Dataset_Id as (type text meta [
         Documentation.FieldCaption = "Data set ID",
-        Documentation.FieldDescription = "ID of the data set on Explore Education Statistics (pre-production)",
+        Documentation.FieldDescription = "ID of the data set on Explore Education Statistics",
         DataSource.Path = false // don't include in data source path calculation
+    ]),
+    ees_environment as (type text meta [
+        Documentation.FieldCaption = "EES environment",
+        Documentation.FieldDescription = "SteamID64 value. You can provide this value to avoid the additional lookup.",
+        Documentation.AllowedValues = {"Production", "Pre-production"}
     ])
     )
 
     as table meta [
-        Documentation.Name = "EES data set (pre-production)",
-        Documentation.LongDescription = "Retrieve an EES pre-production data set from its CSV endpoint"
+        Documentation.Name = "EES data set",
+        Documentation.LongDescription = "Retrieve an EES data set from its CSV endpoint"
     ];
 
-ContentsImpl = (Dataset_Id as text) =>
+ContentsImpl = (Dataset_Id as text, ees_environment as text) =>
     let
     // Query the latest version
-    Source_Csv = Csv.Document(Web.Contents("https://pp-api.education.gov.uk/statistics-preprod/v1/data-sets/" & Dataset_Id & "/csv?dataSetVersion=*"), [Delimiter=",", Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    api_url = if ees_environment = "Production" then "https://api.education.gov.uk/statistics" else
+        if ees_environment = "Pre-production" then "https://pp-api.education.gov.uk/statistics-preprod" else
+        "https://api.education.gov.uk/statistics",
+    Source_Csv = Csv.Document(Web.Contents(api_url & "/v1/data-sets/" & Dataset_Id & "/csv?dataSetVersion=*"), [Delimiter=",", Encoding=1252, QuoteStyle=QuoteStyle.None]),
     Data_With_Headers = Table.PromoteHeaders(Source_Csv, [PromoteAllScalars=true]),
     Data_Set = Table.TransformColumnTypes(Data_With_Headers, {{"time_period", type text}, {"time_identifier", type text}, {"geographic_level", type text}, {"country_code", type text}, {"country_name", type text}})
 
