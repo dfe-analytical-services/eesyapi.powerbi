@@ -18,6 +18,8 @@ This connector retrieves an entire data set on request when given a data set ID.
 
 ### Using this connector in Power BI
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/niHlIKnS4is?si=hmucodX8gO1u7FS-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 #### Step-by-step
 
 - Complete the steps in [Enabling custom connectors in Power BI](#enabling-custom-connectors-in-power-bi) if this is your first time using a custom connector in Power BI Desktop.
