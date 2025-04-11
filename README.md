@@ -18,7 +18,7 @@ This connector retrieves an entire data set on request when given a data set ID.
 
 ### Using this connector in Power BI
 
-#### Video demo (opens on Youtube.com)
+#### [Video demo (opens on Youtube.com)](https://www.youtube.com/watch?v=niHlIKnS4is)
 
 [![Final video of fixing issues in your code in VS Code](https://img.youtube.com/vi/niHlIKnS4is/maxresdefault.jpg)](https://www.youtube.com/watch?v=niHlIKnS4is)
 
