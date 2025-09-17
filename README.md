@@ -47,6 +47,14 @@ As Microsoft have currently put [certification for custom connectors](https://le
 
 As soon as the certification process is live again, we plan to put this connector through the certification, enabling auto-refresh functionality without the need for further steps by end users.
 
+# Related tools
+
+The following are related resources available to help users connect to the EES API from a range of analytical software.
+
+- [eesyapi.R](https://github.com/dfe-analytical-services/eesyapi.R/): Tools to connect to the EES API from R (In development)
+- [eesyapi.python](https://github.com/dfe-analytical-services/eesyapi.python/): Tools to connect to the EES API from Python (In development)
+- [Connecting to DfE data from Excel using the EES API](https://www.youtube.com/watch?v=Un5G50v1Zxc&t=9s): Video guide on connecting to an EES API data set from Excel
+
 # Contributing
 
 These connectors are being developed in **VS Code** with the **Power Query SDK** extension installed.
