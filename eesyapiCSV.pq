@@ -6,9 +6,6 @@ section eesyapiCSV;
 shared eesyapiCSV.Contents = () =>
 
 let
-    // =========================
-    // 1. PUBLICATIONS FETCH
-    // =========================
     PublicationsJson =
         Json.Document(
             Web.Contents("https://api.education.gov.uk/statistics/v1/publications")
@@ -16,9 +13,6 @@ let
 
     PublicationsList = PublicationsJson[results],
 
-    // =========================
-    // 2. BUILD FOLDERS (PUBLICATIONS)
-    // =========================
     GroupedRecords =
         List.Transform(
             PublicationsList,
@@ -27,23 +21,17 @@ let
                     pubId = _[id],
                     pubTitle = _[title],
 
-                    // =========================
-                    // 3. DATASETS FETCH
-                    // =========================
                     dsJson =
                         Json.Document(
                             Web.Contents(
                                 "https://api.education.gov.uk/statistics/v1/publications/"
-                                    & pubId
-                                    & "/data-sets"
+                                & pubId &
+                                "/data-sets"
                             )
                         ),
 
                     dsList = dsJson[results],
 
-                    // =========================
-                    // 4. DATASET ITEMS (TABLE LEVEL)
-                    // =========================
                     DataSetItems =
                         List.Transform(
                             dsList,
@@ -52,7 +40,6 @@ let
                                     dsTitle = ds[title],
                                     dsSummary = try ds[summary] otherwise "",
 
-                                    // 👉 CLEAN DISPLAY NAME (TITLE + SUMMARY)
                                     displayName =
                                         if dsSummary <> "" then
                                             dsTitle & " - " & dsSummary
@@ -63,12 +50,11 @@ let
                                     Name = displayName,
                                     Key = ds[id],
 
-                                    Data =
-                                        LoadSelectedData(ds[id]),
+                                    Data = LoadDataSetVersions(ds[id]),
 
-                                    ItemKind = "Table",
-                                    ItemName = "Table",
-                                    IsLeaf = true
+                                    ItemKind = "Folder",
+                                    ItemName = "Folder",
+                                    IsLeaf = false
                                 ]
                         ),
 
@@ -93,9 +79,6 @@ let
                     ]
         ),
 
-    // =========================
-    // 5. FINAL NAVIGATION TABLE
-    // =========================
     NavTable = Table.FromRecords(GroupedRecords),
 
     FinalNav =
@@ -108,19 +91,123 @@ let
             "ItemName",
             "IsLeaf"
         )
+
 in
     FinalNav;
 
 
-// =========================
-// 6. DATA LOADER (CSV)
-// =========================
-LoadSelectedData = (dataSetId as text) =>
+
+LoadDataSetVersions = (dataSetId as text) =>
+
+let
+    VersionsJson =
+        Json.Document(
+            Web.Contents(
+                "https://api.education.gov.uk/statistics/v1/data-sets/"
+                & dataSetId &
+                "/versions"
+            )
+        ),
+
+    VersionsList = VersionsJson[results],
+
+    SortedVersions =
+        List.Sort(
+            VersionsList,
+            (x,y) => if x[version] > y[version] then -1 else 1
+        ),
+
+    LatestVersion = Text.From(SortedVersions{0}[version]),
+
+    LatestItem =
+        [
+            Name = "Latest Version",
+            Key = "latest",
+
+            Data =
+                LoadSelectedVersion(
+                    dataSetId,
+                    LatestVersion
+                ),
+
+            ItemKind = "Table",
+            ItemName = "Table",
+            IsLeaf = true
+        ],
+
+    OlderVersions =
+        List.Transform(
+            SortedVersions,
+            each
+                let
+                    versionNumber = Text.From(_[version])
+                in
+                [
+                    Name = "Version " & versionNumber,
+                    Key = versionNumber,
+
+                    Data =
+                        LoadSelectedVersion(
+                            dataSetId,
+                            versionNumber
+                        ),
+
+                    ItemKind = "Table",
+                    ItemName = "Table",
+                    IsLeaf = true
+                ]
+        ),
+
+    OlderVersionsTable =
+        Table.ToNavigationTable(
+            Table.FromRecords(OlderVersions),
+            {"Key"},
+            "Name",
+            "Data",
+            "ItemKind",
+            "ItemName",
+            "IsLeaf"
+        ),
+
+    FinalItems =
+        {
+            LatestItem,
+            [
+                Name = "Older Versions",
+                Key = "older",
+                Data = OlderVersionsTable,
+                ItemKind = "Folder",
+                ItemName = "Folder",
+                IsLeaf = false
+            ]
+        },
+
+    FinalTable =
+        Table.ToNavigationTable(
+            Table.FromRecords(FinalItems),
+            {"Key"},
+            "Name",
+            "Data",
+            "ItemKind",
+            "ItemName",
+            "IsLeaf"
+        )
+
+in
+    FinalTable;
+
+
+
+LoadSelectedVersion =
+(dataSetId as text, version as text) =>
+
 let
     DownloadUrl =
         "https://api.education.gov.uk/statistics/v1/data-sets/"
-            & dataSetId
-            & "/csv",
+        & dataSetId &
+        "/versions/"
+        & version &
+        "/csv",
 
     Source =
         Csv.Document(
@@ -134,13 +221,12 @@ let
 
     PromotedHeaders =
         Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+
 in
     PromotedHeaders;
 
 
-// =========================
-// 7. NAVIGATION HELPER
-// =========================
+
 Table.ToNavigationTable =
 (
     table as table,
@@ -174,9 +260,7 @@ in
     navigationTable;
 
 
-// =========================
-// 8. CONNECTOR SETTINGS
-// =========================
+
 eesyapiCSV =
 [
     Authentication = [
