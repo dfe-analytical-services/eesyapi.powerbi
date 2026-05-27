@@ -60,21 +60,26 @@ let
                                             dsTitle,
 
                                     // =========================
-                                    // 5. GET DATASET VERSIONS
+                                    // 5. GET ALL DATASET VERSIONS (PAGINATED LOOP)
                                     // =========================
-                                    versionsJson =
-                                        Json.Document(
-                                            Web.Contents(
-                                                "https://api.education.gov.uk/statistics/v1/data-sets/"
-                                                    & dsId
-                                                    & "/versions"
-                                            )
-                                        ),
+                                    FetchAllVersions = (pageNumber as number) as list =>
+                                        let
+                                            CurrentUrl = "https://api.education.gov.uk/statistics/v1/data-sets/" 
+                                                         & dsId 
+                                                         & "/versions?page=" 
+                                                         & Text.From(pageNumber),
+                                            Response = Json.Document(Web.Contents(CurrentUrl)),
+                                            CurrentResults = Response[results],
+                                            
+                                            NextPageExists = try (Response[paging][page] < Response[paging][totalPages]) otherwise false,
+                                            NextResults = if NextPageExists then @FetchAllVersions(pageNumber + 1) else {}
+                                        in
+                                            List.Combine({CurrentResults, NextResults}),
 
-                                    versionsList = versionsJson[results],
+                                    versionsList = FetchAllVersions(1),
 
                                     // =========================
-                                    // 6. BUILD VERSION TABLE
+                                    // 6. BUILD VERSION RECORDS WITH NUMERIC PARTS
                                     // =========================
                                     VersionItems =
                                         List.Transform(
@@ -82,35 +87,61 @@ let
                                             (ver) =>
                                                 let
                                                     verNum = Text.From(ver[version]),
-                                                    releaseDate =
-                                                        try Date.ToText(
-                                                            Date.From(ver[published]),
-                                                            "yyyy-MM-dd"
-                                                        )
-                                                        otherwise ""
+                                                    
+                                                    // Numeric Split logic for perfect version sorting (e.g., "2.12" -> Major=2, Minor=12)
+                                                    versionParts = Text.Split(verNum, "."),
+                                                    majorPart = try Number.From(versionParts{0}) otherwise 0,
+                                                    minorPart = try Number.From(versionParts{1}) otherwise 0,
+                                                    
+                                                    rawDateStr = try ver[published] otherwise 
+                                                                 (try ver[publishedDate] otherwise 
+                                                                 (try ver[updated] otherwise 
+                                                                 (try ver[lastUpdated] otherwise ""))),
+                                                    
+                                                    cleanDateStr = if Text.Length(rawDateStr) >= 10 then Text.Start(rawDateStr, 10) else rawDateStr,
+                                                    
+                                                    parsedDate = try Date.From(cleanDateStr) otherwise #date(1970, 1, 1),
+                                                    
+                                                    releaseDateText = if parsedDate = #date(1970, 1, 1) then "Date Pending" else Date.ToText(parsedDate, "dd-MM-yyyy"),
+                                                    
+                                                    finalName = "Version " & verNum & " (" & releaseDateText & ")"
                                                 in
                                                     [
-                                                        Name =
-                                                            "Version "
-                                                                & verNum
-                                                                & " ("
-                                                                & releaseDate
-                                                                & ")",
-
+                                                        Name = finalName,
                                                         Key = verNum,
-
-                                                        Data =
-                                                            LoadCSV(dsId),
-
+                                                        Data = Expression.Evaluate("() => LoadCSV(""" & dsId & """)", [LoadCSV = LoadCSV])(),
                                                         ItemKind = "Table",
                                                         ItemName = "Table",
-                                                        IsLeaf = true
+                                                        IsLeaf = true,
+                                                        SortDate = parsedDate,
+                                                        Major = majorPart,
+                                                        Minor = minorPart
                                                     ]
                                         ),
 
+                                    VersionTableRaw = Table.FromRecords(VersionItems),
+
+                                    // =========================
+                                    // CRITICAL FIX: MULTI-LAYERED TRUE DESCENDING SORT
+                                    // =========================
+                                    // 1st Priority: Newest Date 
+                                                    // 2nd Priority: Highest Major Version Number (e.g., 2.x over 1.x)
+                                                    // 3rd Priority: Highest Minor Version Number (e.g., 2.12 over 2.2)
+                                    SortedVersionTable = Table.Sort(
+                                        VersionTableRaw, 
+                                        {
+                                            {"SortDate", Order.Descending}, 
+                                            {"Major", Order.Descending}, 
+                                            {"Minor", Order.Descending}
+                                        }
+                                    ),
+                                    
+                                    // Cleanup tracking sorting columns before loading UI
+                                    CleanVersionTable = Table.RemoveColumns(SortedVersionTable, {"SortDate", "Major", "Minor"}),
+
                                     VersionTable =
                                         Table.ToNavigationTable(
-                                            Table.FromRecords(VersionItems),
+                                            CleanVersionTable,
                                             {"Key"},
                                             "Name",
                                             "Data",
