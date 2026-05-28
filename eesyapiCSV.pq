@@ -1,5 +1,3 @@
-[Version = "1.0.0"]
-
 section eesyapiCSV;
 
 [DataSource.Kind="eesyapiCSV", Publish="eesyapiCSV.Publish"]
@@ -60,49 +58,102 @@ let
                                             dsTitle,
 
                                     // =========================
-                                    // 5. GET ALL DATASET VERSIONS (PAGINATED LOOP)
+                                    // 5. GET ALL DATASET VERSIONS
                                     // =========================
                                     FetchAllVersions = (pageNumber as number) as list =>
                                         let
-                                            CurrentUrl = "https://api.education.gov.uk/statistics/v1/data-sets/" 
-                                                         & dsId 
-                                                         & "/versions?page=" 
-                                                         & Text.From(pageNumber),
-                                            Response = Json.Document(Web.Contents(CurrentUrl)),
+                                            CurrentUrl =
+                                                "https://api.education.gov.uk/statistics/v1/data-sets/"
+                                                    & dsId
+                                                    & "/versions?page="
+                                                    & Text.From(pageNumber),
+
+                                            Response =
+                                                Json.Document(
+                                                    Web.Contents(CurrentUrl)
+                                                ),
+
                                             CurrentResults = Response[results],
-                                            
-                                            NextPageExists = try (Response[paging][page] < Response[paging][totalPages]) otherwise false,
-                                            NextResults = if NextPageExists then @FetchAllVersions(pageNumber + 1) else {}
+
+                                            NextPageExists =
+                                                try (
+                                                    Response[paging][page]
+                                                        < Response[paging][totalPages]
+                                                )
+                                                otherwise false,
+
+                                            NextResults =
+                                                if NextPageExists then
+                                                    @FetchAllVersions(pageNumber + 1)
+                                                else
+                                                    {}
                                         in
-                                            List.Combine({CurrentResults, NextResults}),
+                                            List.Combine(
+                                                {
+                                                    CurrentResults,
+                                                    NextResults
+                                                }
+                                            ),
 
                                     versionsList = FetchAllVersions(1),
 
                                     // =========================
-                                    // 6. BUILD VERSION RECORDS WITH SORTING WEIGHTS
+                                    // 6. BUILD VERSION RECORDS
                                     // =========================
                                     VersionItems =
                                         List.Transform(
                                             versionsList,
                                             (ver) =>
                                                 let
-                                                    verNum = Text.From(ver[version]),
-                                                    
-                                                    // Dynamic numeric weighting logic for semantic version control
-                                                    versionParts = Text.Split(verNum, "."),
-                                                    majorPart = try Number.From(versionParts{0}) otherwise 0,
-                                                    minorPart = try Number.From(versionParts{1}) otherwise 0,
-                                                    patchPart = try Number.From(versionParts{2}) otherwise 0,
-                                                    
-                                                    rawDateStr = try ver[published] otherwise 
-                                                                 (try ver[publishedDate] otherwise 
-                                                                 (try ver[updated] otherwise 
-                                                                 (try ver[lastUpdated] otherwise ""))),
-                                                    
-                                                    cleanDateStr = if Text.Length(rawDateStr) >= 10 then Text.Start(rawDateStr, 10) else rawDateStr,
-                                                    parsedDate = try Date.From(cleanDateStr) otherwise #date(1970, 1, 1),
-                                                    
-                                                    releaseDateText = if parsedDate = #date(1970, 1, 1) then "Date Pending" else Date.ToText(parsedDate, "dd-MM-yyyy")
+                                                    verNum =
+                                                        Text.From(ver[version]),
+
+                                                    versionParts =
+                                                        Text.Split(verNum, "."),
+
+                                                    majorPart =
+                                                        try Number.From(versionParts{0})
+                                                        otherwise 0,
+
+                                                    minorPart =
+                                                        try Number.From(versionParts{1})
+                                                        otherwise 0,
+
+                                                    patchPart =
+                                                        try Number.From(versionParts{2})
+                                                        otherwise 0,
+
+                                                    rawDateStr =
+                                                        try ver[published]
+                                                        otherwise (
+                                                            try ver[publishedDate]
+                                                            otherwise (
+                                                                try ver[updated]
+                                                                otherwise (
+                                                                    try ver[lastUpdated]
+                                                                    otherwise ""
+                                                                )
+                                                            )
+                                                        ),
+
+                                                    cleanDateStr =
+                                                        if Text.Length(rawDateStr) >= 10 then
+                                                            Text.Start(rawDateStr, 10)
+                                                        else
+                                                            rawDateStr,
+
+                                                    parsedDate =
+                                                        try Date.From(cleanDateStr)
+                                                        otherwise #date(1970, 1, 1),
+
+                                                    releaseDateText =
+                                                        if parsedDate = #date(1970, 1, 1) then
+                                                            "Date Pending"
+                                                        else
+                                                            Date.ToText(
+                                                                parsedDate,
+                                                                "dd-MM-yyyy"
+                                                            )
                                                 in
                                                     [
                                                         BaseVerNum = verNum,
@@ -114,43 +165,79 @@ let
                                                     ]
                                         ),
 
-                                    VersionTableRaw = Table.FromRecords(VersionItems),
+                                    VersionTableRaw =
+                                        Table.FromRecords(VersionItems),
 
-                                    // Local rigid sort: Newest date first, then highest version breakdown
-                                    SortedVersionTableLocal = Table.Sort(
-                                        VersionTableRaw, 
-                                        {
-                                            {"SortDate", Order.Descending}, 
-                                            {"Major", Order.Descending}, 
-                                            {"Minor", Order.Descending},
-                                            {"Patch", Order.Descending}
-                                        }
-                                    ),
-                                    
                                     // =========================
-                                    // THE ULTIMATE FIX FOR POWER BI NAVIGATOR AUTO-SORT:
-                                    // We inject a 2-digit zero-padded index prefix directly into the Display Name.
-                                    // This forces Power BI's automatic A-Z list to display them exactly in our sorted order.
+                                    // SORT LATEST FIRST (CRITICAL SORT)
                                     // =========================
-                                    WithRankIndex = Table.AddIndexColumn(SortedVersionTableLocal, "RankIndex", 1, 1, Int64.Type),
-                                    
-                                    FinalVersionRecords = Table.AddColumn(WithRankIndex, "FinalStructure", each 
-                                        let
-                                            // Format: "01. Version 1.20 (14-05-2026)"
-                                            Prefix = Text.PadStart(Text.From(_[RankIndex]), 2, "0") & ". ",
-                                            ForcedDisplayName = Prefix & "Version " & _[BaseVerNum] & " (" & _[ReleaseDate] & ")"
-                                        in
-                                            [
-                                                Name = ForcedDisplayName,
-                                                Key = Text.PadStart(Text.From(_[RankIndex]), 6, "0"), 
-                                                Data = Expression.Evaluate("() => LoadCSV(""" & dsId & """)", [LoadCSV = LoadCSV])(),
-                                                ItemKind = "Table",
-                                                ItemName = "Table",
-                                                IsLeaf = true
-                                            ]
-                                    ),
-                                    
-                                    CleanVersionTable = Table.FromRecords(FinalVersionRecords[FinalStructure]),
+                                    SortedVersionTableLocal =
+                                        Table.Sort(
+                                            VersionTableRaw,
+                                            {
+                                                {"SortDate", Order.Descending},
+                                                {"Major", Order.Descending},
+                                                {"Minor", Order.Descending},
+                                                {"Patch", Order.Descending}
+                                            }
+                                        ),
+
+                                    // =========================
+                                    // INTERNAL SORT INDEX
+                                    // =========================
+                                    WithRankIndex =
+                                        Table.AddIndexColumn(
+                                            SortedVersionTableLocal,
+                                            "RankIndex",
+                                            1,
+                                            1,
+                                            Int64.Type
+                                        ),
+
+                                    // =========================
+                                    // FINAL VERSION STRUCTURE
+                                    // =========================
+                                    FinalVersionRecords =
+                                        Table.AddColumn(
+                                            WithRankIndex,
+                                            "FinalStructure",
+                                            each
+                                                let
+                                                    // FIX: RankIndex ko text banaya padding ke sath (01, 02, etc.) taaki Power BI automatic standard sorting follow kare
+                                                    PrefixNumber = Text.PadStart(Text.From(_[RankIndex]), 2, "0"),
+                                                    
+                                                    // Yeh aapko Top Most sort bhi dega aur Data panel me poora text bhi dikhayega
+                                                    SortedDisplayName =
+                                                        PrefixNumber 
+                                                            & ". Version "
+                                                            & _[BaseVerNum]
+                                                            & " ("
+                                                            & _[ReleaseDate]
+                                                            & ")"
+                                                in
+                                                    [
+                                                        Name = SortedDisplayName,
+
+                                                        Key = _[BaseVerNum],
+
+                                                        Data =
+                                                            Expression.Evaluate(
+                                                                "() => LoadCSV(""" & dsId & """, """ & _[BaseVerNum] & """, """ & _[ReleaseDate] & """)",
+                                                                [LoadCSV = LoadCSV]
+                                                            )(),
+
+                                                        ItemKind = "Table",
+                                                        
+                                                        // Name ko hi ItemName banaya taaki Data Panel me wahi ordered naam saaf dikhe
+                                                        ItemName = SortedDisplayName,
+                                                        IsLeaf = true
+                                                    ]
+                                        ),
+
+                                    CleanVersionTable =
+                                        Table.FromRecords(
+                                            FinalVersionRecords[FinalStructure]
+                                        ),
 
                                     VersionTable =
                                         Table.ToNavigationTable(
@@ -217,7 +304,7 @@ in
 // =========================
 // 8. CSV LOADER
 // =========================
-LoadCSV = (dataSetId as text) =>
+LoadCSV = (dataSetId as text, versionNum as text, releaseDate as text) =>
 let
     DownloadUrl =
         "https://api.education.gov.uk/statistics/v1/data-sets/"
@@ -235,10 +322,13 @@ let
         ),
 
     PromotedHeaders =
-        Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+        Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+    AddVersionColumn = Table.AddColumn(PromotedHeaders, "Dataset Version", each versionNum, type text),
+    AddDateColumn = Table.AddColumn(AddVersionColumn, "Release Date", each releaseDate, type text)
 
 in
-    PromotedHeaders;
+    AddDateColumn;
 
 
 // =========================
