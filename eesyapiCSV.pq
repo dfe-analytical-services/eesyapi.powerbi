@@ -367,7 +367,7 @@ in
 
 
 // =========================
-// 10. CONNECTOR SETTINGS
+// 10. CONNECTOR SETTINGS (UPDATED FOR LOGO FIX)
 // =========================
 eesyapiCSV =
 [
@@ -386,13 +386,10 @@ eesyapiCSV.Publish =
     SourceTypeImage = eesyapiCSV.Icons
 ];
 
-eesyapiCSV.Icons =
-[
-    Icon16 = {
-        Extension.Contents("eesyapiCSV16.png")
-    },
-
-    Icon32 = {
-        Extension.Contents("eesyapiCSV32.png")
-    }
+eesyapiCSV.Icons = [
+    Icon16 = Extension.Contents("eesyapiCSV16.png"),
+    Icon24 = Extension.Contents("eesyapiCSV24.png"),
+    Icon32 = Extension.Contents("eesyapiCSV32.png"),
+    Icon40 = Extension.Contents("eesyapiCSV40.png"),
+    Icon48 = Extension.Contents("eesyapiCSV48.png")
 ];
