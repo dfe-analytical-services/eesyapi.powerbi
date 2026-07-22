@@ -76,3 +76,33 @@ The following are useful to read / watch if starting out on contributing.
 ## Acknowlegements
 
 Thanks to Wayne Perry for giving us a steer towards custom connectors and a starting point in writing this one.
+
+
+Steps to Follow : 
+
+## Navigating publications, datasets and versions
+
+The connector allows users to browse the Explore Education Statistics (EES) API directly from the Power BI Navigator.
+
+After selecting the connector, users can explore the available data through a hierarchical structure:
+
+**Publication → Dataset → Dataset Version**
+
+### Steps to load data
+
+1. In **Power BI Desktop**, click **Get Data**.
+2. Search for **eesyapi** and select **eesyapiCSV.Contents (Beta) (Custom)**.
+3. Click **Connect**.
+
+After connecting, the Power BI Navigator will display:
+
+* A list of **Publications** available from the EES API.
+* Expanding a publication will show the available **Datasets** within that publication.
+* Each dataset is displayed with its **Title and Summary** to help users identify the correct dataset.
+* Expanding a dataset will display the available **Dataset Versions**.
+* Users can select the required **version** of the dataset.
+
+Once a version is selected, Power BI will retrieve the dataset using the EES CSV endpoint and display a preview of the data. Users can then choose to **Load** the data directly or **Transform Data** using Power Query.
+
+> Note
+> The dataset version list is retrieved from the EES API metadata. The CSV endpoint currently returns the latest available dataset data.
