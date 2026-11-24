@@ -61,6 +61,8 @@ These connectors are being developed in **VS Code** with the **Power Query SDK**
 
 If making changes to any power query script, make sure to run **Evaluate current file** on the corresponding *[script_name].query.pq* script in the **POWER QUERY SDK** panel under the file explorer pane in VS Code. This compiles the relevant *MEZ* binary file that can be used for debugging and that users can copy across to their custom connectors folder.
 
+If you don't have the Power Query SDK tools, MSBuild or dotnet available, you can build the *MEZ* binary directly by running `.\build-mez.ps1` (PowerShell) or `./build-mez.sh` (bash, requires `zip`) from the repository root. Either writes **bin/AnyCPU/Debug/eesyapiCSV.mez**.
+
 > 🚧 Warning
 >
 > If you run **Evaluate current file** on the base *[script_name].pq* script (as opposed to the *[script_name].query.pq* script), then Power Query SDK will likely double compile the script and give an error along the lines of `The export [script_name].Contents was exported multiple times.`
