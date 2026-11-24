@@ -387,9 +387,16 @@ eesyapiCSV.Publish =
 ];
 
 eesyapiCSV.Icons = [
-    Icon16 = Extension.Contents("eesyapiCSV16.png"),
-    Icon24 = Extension.Contents("eesyapiCSV24.png"),
-    Icon32 = Extension.Contents("eesyapiCSV32.png"),
-    Icon40 = Extension.Contents("eesyapiCSV40.png"),
-    Icon48 = Extension.Contents("eesyapiCSV48.png")
+    Icon16 = {
+        Extension.Contents("eesyapiCSV16.png"),
+        Extension.Contents("eesyapiCSV20.png"),
+        Extension.Contents("eesyapiCSV24.png"),
+        Extension.Contents("eesyapiCSV32.png")
+    },
+    Icon32 = {
+        Extension.Contents("eesyapiCSV32.png"),
+        Extension.Contents("eesyapiCSV40.png"),
+        Extension.Contents("eesyapiCSV48.png"),
+        Extension.Contents("eesyapiCSV64.png")
+    }
 ];
